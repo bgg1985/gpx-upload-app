@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPX/TCX File Viewer with Pub Finder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍺 GPX Route Pub Finder</h1>
+            <p>Upload your GPS route file to find pubs and bars along the way</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <input type="file" id="fileInput" accept=".gpx,.tcx" hidden>
+                <div class="upload-content">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h3>Drop your GPX or TCX file here</h3>
+                    <p>or click to browse</p>
+                    <button id="browseBtn" class="btn-primary">Browse Files</button>
+                </div>
+            </div>
+            <div id="loadingIndicator" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Processing file...</p>
+            </div>
+        </div>
+
+        <div id="results" class="results hidden">
+            <div class="info-section">
+                <h2>Route Information</h2>
+                <div id="routeInfo" class="info-grid"></div>
+            </div>
+
+            <div class="search-section">
+                <h2>🍺 Find Pubs & Bars Along Route</h2>
+                <div class="search-controls">
+                    <div class="control-group">
+                        <label for="searchDistance">Search Distance:</label>
+                        <div class="distance-input">
+                            <input type="range" id="searchDistance" min="50" max="1000" step="50" value="200">
+                            <span id="distanceValue">200m</span>
+                        </div>
+                        <p class="help-text">Find establishments within this distance of your route</p>
+                    </div>
+                    <button id="searchBtn" class="btn-primary btn-large">
+                        🔍 Search for Drinking Establishments
+                    </button>
+                </div>
+                <div id="searchLoading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Searching OpenStreetMap...</p>
+                </div>
+                <div id="searchResults" class="search-results hidden">
+                    <div class="results-header">
+                        <h3>Found <span id="establishmentCount">0</span> establishments</h3>
+                        <button id="downloadBtn" class="btn-success">
+                            ⬇️ Download GPX with Pubs
+                        </button>
+                    </div>
+                    <div id="establishmentsList" class="establishments-list"></div>
+                </div>
+            </div>
+
+            <div class="map-section">
+                <h2>Map View</h2>
+                <div id="map"></div>
+            </div>
+
+            <div class="waypoints-section">
+                <h2>Original Points of Interest (<span id="waypointCount">0</span>)</h2>
+                <div id="waypointsList" class="waypoints-list"></div>
+            </div>
+
+            <div class="track-section">
+                <h2>Track Data (<span id="trackCount">0</span> points)</h2>
+                <div id="trackStats" class="stats-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/uiManager.js"></script>
+    <script src="js/mapManager.js"></script>
+    <script src="js/searchManager.js"></script>
+    <script src="js/fileUpload.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
