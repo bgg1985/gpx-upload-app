@@ -26,9 +26,10 @@ function generateGPXFile(data, establishments) {
           lon: wpt.lon
         },
         name: wpt.name,
+        cmt: isDrinkingEstablishment(wpt.type) ? wpt.type : undefined,
         desc: wpt.desc || '',
-        type: wpt.type || 'generic',
-        sym: isDrinkingEstablishment(wpt.type) ? 'Bar' : 'Dot'
+        type: isDrinkingEstablishment(wpt.type) ? 'food' : (wpt.type || 'generic'),
+        sym: 'Dot'
       })),
       trk: {
         name: data.metadata.name || 'Track',
