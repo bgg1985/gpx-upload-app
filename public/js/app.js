@@ -1,33 +1,31 @@
-cat > public/js/app.js << 'EOF'
 const AppState = {
   currentRouteData: null,
   foundEstablishments: [],
   
-  setRouteData(data) {
+  setRouteData: function(data) {
     this.currentRouteData = data;
   },
   
-  setEstablishments(establishments) {
+  setEstablishments: function(establishments) {
     this.foundEstablishments = establishments;
   },
   
-  getRouteData() {
+  getRouteData: function() {
     return this.currentRouteData;
   },
   
-  getEstablishments() {
+  getEstablishments: function() {
     return this.foundEstablishments;
   },
   
-  reset() {
+  reset: function() {
     this.currentRouteData = null;
     this.foundEstablishments = [];
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   console.log('GPX Route Pub Finder initialized');
   FileUploadManager.init();
   SearchManager.init();
 });
-EOF

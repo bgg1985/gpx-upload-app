@@ -1,13 +1,12 @@
-cat > public/js/fileUpload.js << 'EOF'
 const FileUploadManager = {
   elements: {},
   
-  init() {
+  init: function() {
     this.cacheElements();
     this.attachEventListeners();
   },
   
-  cacheElements() {
+  cacheElements: function() {
     this.elements = {
       uploadBox: document.getElementById('uploadBox'),
       fileInput: document.getElementById('fileInput'),
@@ -18,41 +17,49 @@ const FileUploadManager = {
     };
   },
   
-  attachEventListeners() {
+  attachEventListeners: function() {
     const self = this;
     const uploadBox = this.elements.uploadBox;
     const fileInput = this.elements.fileInput;
     const browseBtn = this.elements.browseBtn;
     
-    uploadBox.addEventListener('click', () => fileInput.click());
-    browseBtn.addEventListener('click', (e) => {
+    uploadBox.addEventListener('click', function() {
+      fileInput.click();
+    });
+    
+    browseBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       fileInput.click();
     });
     
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
-      if (file) self.uploadFile(file);
+      if (file) {
+        self.uploadFile(file);
+      }
     });
     
-    uploadBox.addEventListener('dragover', (e) => {
+    uploadBox.addEventListener('dragover', function(e) {
       e.preventDefault();
       uploadBox.classList.add('dragover');
     });
     
-    uploadBox.addEventListener('dragleave', () => {
+    uploadBox.addEventListener('dragleave', function() {
       uploadBox.classList.remove('dragover');
     });
     
-    uploadBox.addEventListener('drop', (e) => {
+    uploadBox.addEventListener('drop', function(e) {
       e.preventDefault();
       uploadBox.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
-      if (file) self.uploadFile(file);
+      if (file) {
+        self.uploadFile(file);
+      }
     });
   },
   
-  async uploadFile(file) {
+  uploadFile: function(file) {
+    const self = this;
     const formData = new FormData();
     formData.append('gpxFile', file);
 
@@ -60,31 +67,33 @@ const FileUploadManager = {
     UIManager.hideResults();
     UIManager.hideSearchResults();
 
-    try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await response.json();
-
+    fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(result) {
       if (result.success) {
         AppState.setRouteData(result.data);
         AppState.setEstablishments([]);
-        this.displayResults(result.data);
+        self.displayResults(result.data);
       } else {
         alert('Error: ' + (result.error || 'Unknown error'));
       }
-    } catch (error) {
+    })
+    .catch(function(error) {
       console.error('Upload error:', error);
       alert('Failed to upload file: ' + error.message);
-    } finally {
+    })
+    .finally(function() {
       UIManager.hideLoading();
-      this.elements.fileInput.value = '';
-    }
+      self.elements.fileInput.value = '';
+    });
   },
   
-  displayResults(data) {
+  displayResults: function(data) {
     UIManager.showResults();
     UIManager.displayRouteInfo(data);
     MapManager.displayMap(data);
@@ -93,4 +102,3 @@ const FileUploadManager = {
     UIManager.scrollToResults();
   }
 };
-EOF

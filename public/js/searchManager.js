@@ -1,13 +1,12 @@
-cat > public/js/searchManager.js << 'EOF'
 const SearchManager = {
   elements: {},
   
-  init() {
+  init: function() {
     this.cacheElements();
     this.attachEventListeners();
   },
   
-  cacheElements() {
+  cacheElements: function() {
     this.elements = {
       searchDistance: document.getElementById('searchDistance'),
       distanceValue: document.getElementById('distanceValue'),
@@ -17,26 +16,24 @@ const SearchManager = {
     };
   },
   
-  attachEventListeners() {
+  attachEventListeners: function() {
     const self = this;
-    const searchDistance = this.elements.searchDistance;
-    const searchBtn = this.elements.searchBtn;
-    const downloadBtn = this.elements.downloadBtn;
     
-    searchDistance.addEventListener('input', (e) => {
+    this.elements.searchDistance.addEventListener('input', function(e) {
       self.elements.distanceValue.textContent = e.target.value + 'm';
     });
     
-    searchBtn.addEventListener('click', () => {
+    this.elements.searchBtn.addEventListener('click', function() {
       self.searchEstablishments();
     });
     
-    downloadBtn.addEventListener('click', () => {
+    this.elements.downloadBtn.addEventListener('click', function() {
       self.downloadGPX();
     });
   },
   
-  async searchEstablishments() {
+  searchEstablishments: function() {
+    const self = this;
     const routeData = AppState.getRouteData();
     
     if (!routeData || !routeData.track) {
@@ -50,20 +47,20 @@ const SearchManager = {
     UIManager.hideSearchResults();
     this.elements.searchBtn.disabled = true;
 
-    try {
-      const response = await fetch('/api/search-establishments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          track: routeData.track,
-          distance: distance
-        })
-      });
-
-      const result = await response.json();
-
+    fetch('/api/search-establishments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        track: routeData.track,
+        distance: distance
+      })
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(result) {
       if (result.success) {
         AppState.setEstablishments(result.establishments);
         UIManager.displayEstablishments(result.establishments);
@@ -71,16 +68,18 @@ const SearchManager = {
       } else {
         alert('Error: ' + (result.error || 'Unknown error'));
       }
-    } catch (error) {
+    })
+    .catch(function(error) {
       console.error('Search error:', error);
       alert('Failed to search establishments: ' + error.message);
-    } finally {
-      this.elements.searchLoading.classList.add('hidden');
-      this.elements.searchBtn.disabled = false;
-    }
+    })
+    .finally(function() {
+      self.elements.searchLoading.classList.add('hidden');
+      self.elements.searchBtn.disabled = false;
+    });
   },
   
-  async downloadGPX() {
+  downloadGPX: function() {
     const routeData = AppState.getRouteData();
     const establishments = AppState.getEstablishments();
     
@@ -89,35 +88,36 @@ const SearchManager = {
       return;
     }
 
-    try {
-      const response = await fetch('/api/generate-gpx', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          data: routeData,
-          establishments: establishments
-        })
-      });
-
+    fetch('/api/generate-gpx', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: routeData,
+        establishments: establishments
+      })
+    })
+    .then(function(response) {
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'route-with-pubs.gpx';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        return response.blob();
       } else {
-        alert('Failed to generate GPX file');
+        throw new Error('Failed to generate GPX file');
       }
-    } catch (error) {
+    })
+    .then(function(blob) {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'route-with-pubs.gpx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    })
+    .catch(function(error) {
       console.error('Download error:', error);
       alert('Failed to download GPX file: ' + error.message);
-    }
+    });
   }
 };
-EOF

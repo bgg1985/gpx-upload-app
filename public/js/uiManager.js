@@ -1,57 +1,46 @@
-cat > public/js/uiManager.js << 'EOF'
 const UIManager = {
-  showLoading() {
+  showLoading: function() {
     document.getElementById('loadingIndicator').classList.remove('hidden');
   },
   
-  hideLoading() {
+  hideLoading: function() {
     document.getElementById('loadingIndicator').classList.add('hidden');
   },
   
-  showResults() {
+  showResults: function() {
     document.getElementById('results').classList.remove('hidden');
   },
   
-  hideResults() {
+  hideResults: function() {
     document.getElementById('results').classList.add('hidden');
   },
   
-  showSearchResults() {
+  showSearchResults: function() {
     document.getElementById('searchResults').classList.remove('hidden');
   },
   
-  hideSearchResults() {
+  hideSearchResults: function() {
     document.getElementById('searchResults').classList.add('hidden');
   },
   
-  scrollToResults() {
+  scrollToResults: function() {
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
   },
   
-  displayRouteInfo(data) {
+  displayRouteInfo: function(data) {
     const routeInfo = document.getElementById('routeInfo');
-    routeInfo.innerHTML = 
-      '<div class="info-item">' +
-        '<strong>Route Name</strong>' +
-        '<span>' + (data.metadata.name || 'Unnamed') + '</span>' +
-      '</div>' +
-      '<div class="info-item">' +
-        '<strong>Waypoints</strong>' +
-        '<span>' + data.waypoints.length + '</span>' +
-      '</div>' +
-      '<div class="info-item">' +
-        '<strong>Track Points</strong>' +
-        '<span>' + data.track.length + '</span>' +
-      '</div>' +
-      (data.metadata.time ? 
-        '<div class="info-item">' +
-          '<strong>Created</strong>' +
-          '<span>' + new Date(data.metadata.time).toLocaleString() + '</span>' +
-        '</div>' 
-      : '');
+    let html = '<div class="info-item"><strong>Route Name</strong><span>' + (data.metadata.name || 'Unnamed') + '</span></div>';
+    html += '<div class="info-item"><strong>Waypoints</strong><span>' + data.waypoints.length + '</span></div>';
+    html += '<div class="info-item"><strong>Track Points</strong><span>' + data.track.length + '</span></div>';
+    
+    if (data.metadata.time) {
+      html += '<div class="info-item"><strong>Created</strong><span>' + new Date(data.metadata.time).toLocaleString() + '</span></div>';
+    }
+    
+    routeInfo.innerHTML = html;
   },
   
-  displayWaypoints(waypoints) {
+  displayWaypoints: function(waypoints) {
     const waypointsList = document.getElementById('waypointsList');
     const waypointCount = document.getElementById('waypointCount');
     
@@ -62,18 +51,21 @@ const UIManager = {
       return;
     }
 
-    waypointsList.innerHTML = waypoints.map(wpt => 
-      '<div class="waypoint-card">' +
-        '<h3>' + wpt.name + '</h3>' +
-        (wpt.desc ? '<p><strong>Description:</strong> ' + wpt.desc + '</p>' : '') +
-        '<p><strong>Coordinates:</strong> ' + wpt.lat.toFixed(6) + ', ' + wpt.lon.toFixed(6) + '</p>' +
-        (wpt.ele ? '<p><strong>Elevation:</strong> ' + wpt.ele.toFixed(1) + 'm</p>' : '') +
-        (wpt.type ? '<p><strong>Type:</strong> ' + wpt.type + '</p>' : '') +
-      '</div>'
-    ).join('');
+    let html = '';
+    waypoints.forEach(function(wpt) {
+      html += '<div class="waypoint-card">';
+      html += '<h3>' + wpt.name + '</h3>';
+      if (wpt.desc) html += '<p><strong>Description:</strong> ' + wpt.desc + '</p>';
+      html += '<p><strong>Coordinates:</strong> ' + wpt.lat.toFixed(6) + ', ' + wpt.lon.toFixed(6) + '</p>';
+      if (wpt.ele) html += '<p><strong>Elevation:</strong> ' + wpt.ele.toFixed(1) + 'm</p>';
+      if (wpt.type) html += '<p><strong>Type:</strong> ' + wpt.type + '</p>';
+      html += '</div>';
+    });
+    
+    waypointsList.innerHTML = html;
   },
   
-  displayEstablishments(establishments) {
+  displayEstablishments: function(establishments) {
     this.showSearchResults();
     
     const establishmentCount = document.getElementById('establishmentCount');
@@ -86,19 +78,19 @@ const UIManager = {
       return;
     }
 
-    establishmentsList.innerHTML = establishments.map((est, index) =>
-      '<div class="establishment-card" data-index="' + index + '" data-lat="' + est.lat + '" data-lon="' + est.lon + '">' +
-        '<h3>' +
-          '🍺 ' + est.name +
-          '<span class="type-badge">' + est.type + '</span>' +
-        '</h3>' +
-        (est.desc ? '<p><strong>Description:</strong> ' + est.desc + '</p>' : '') +
-        '<p><strong>Coordinates:</strong> ' + est.lat.toFixed(6) + ', ' + est.lon.toFixed(6) + '</p>' +
-      '</div>'
-    ).join('');
+    let html = '';
+    establishments.forEach(function(est, index) {
+      html += '<div class="establishment-card" data-index="' + index + '" data-lat="' + est.lat + '" data-lon="' + est.lon + '">';
+      html += '<h3>🍺 ' + est.name + '<span class="type-badge">' + est.type + '</span></h3>';
+      if (est.desc) html += '<p><strong>Description:</strong> ' + est.desc + '</p>';
+      html += '<p><strong>Coordinates:</strong> ' + est.lat.toFixed(6) + ', ' + est.lon.toFixed(6) + '</p>';
+      html += '</div>';
+    });
+    
+    establishmentsList.innerHTML = html;
 
-    document.querySelectorAll('.establishment-card').forEach(card => {
-      card.addEventListener('click', () => {
+    document.querySelectorAll('.establishment-card').forEach(function(card) {
+      card.addEventListener('click', function() {
         const lat = parseFloat(card.dataset.lat);
         const lon = parseFloat(card.dataset.lon);
         MapManager.zoomToLocation(lat, lon);
@@ -106,7 +98,7 @@ const UIManager = {
     });
   },
   
-  displayTrackStats(track) {
+  displayTrackStats: function(track) {
     const trackStats = document.getElementById('trackStats');
     const trackCount = document.getElementById('trackCount');
     
@@ -117,10 +109,10 @@ const UIManager = {
       return;
     }
 
-    const elevations = track.filter(pt => pt.ele !== null).map(pt => pt.ele);
+    const elevations = track.filter(function(pt) { return pt.ele !== null; }).map(function(pt) { return pt.ele; });
     const minEle = elevations.length > 0 ? Math.min.apply(null, elevations) : 0;
     const maxEle = elevations.length > 0 ? Math.max.apply(null, elevations) : 0;
-    const avgEle = elevations.length > 0 ? elevations.reduce((a, b) => a + b, 0) / elevations.length : 0;
+    const avgEle = elevations.length > 0 ? elevations.reduce(function(a, b) { return a + b; }, 0) / elevations.length : 0;
 
     let totalDistance = 0;
     for (let i = 1; i < track.length; i++) {
@@ -130,32 +122,19 @@ const UIManager = {
       );
     }
 
-    trackStats.innerHTML = 
-      '<div class="stat-card">' +
-        '<span class="value">' + track.length + '</span>' +
-        '<span class="label">Total Points</span>' +
-      '</div>' +
-      '<div class="stat-card">' +
-        '<span class="value">' + (totalDistance / 1000).toFixed(2) + '</span>' +
-        '<span class="label">Distance (km)</span>' +
-      '</div>' +
-      (elevations.length > 0 ? 
-        '<div class="stat-card">' +
-          '<span class="value">' + minEle.toFixed(1) + '</span>' +
-          '<span class="label">Min Elevation (m)</span>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<span class="value">' + maxEle.toFixed(1) + '</span>' +
-          '<span class="label">Max Elevation (m)</span>' +
-        '</div>' +
-        '<div class="stat-card">' +
-          '<span class="value">' + avgEle.toFixed(1) + '</span>' +
-          '<span class="label">Avg Elevation (m)</span>' +
-        '</div>' 
-      : '');
+    let html = '<div class="stat-card"><span class="value">' + track.length + '</span><span class="label">Total Points</span></div>';
+    html += '<div class="stat-card"><span class="value">' + (totalDistance / 1000).toFixed(2) + '</span><span class="label">Distance (km)</span></div>';
+    
+    if (elevations.length > 0) {
+      html += '<div class="stat-card"><span class="value">' + minEle.toFixed(1) + '</span><span class="label">Min Elevation (m)</span></div>';
+      html += '<div class="stat-card"><span class="value">' + maxEle.toFixed(1) + '</span><span class="label">Max Elevation (m)</span></div>';
+      html += '<div class="stat-card"><span class="value">' + avgEle.toFixed(1) + '</span><span class="label">Avg Elevation (m)</span></div>';
+    }
+    
+    trackStats.innerHTML = html;
   },
   
-  calculateDistance(lat1, lon1, lat2, lon2) {
+  calculateDistance: function(lat1, lon1, lat2, lon2) {
     const R = 6371000;
     const phi1 = lat1 * Math.PI / 180;
     const phi2 = lat2 * Math.PI / 180;
@@ -170,4 +149,3 @@ const UIManager = {
     return R * c;
   }
 };
-EOF
