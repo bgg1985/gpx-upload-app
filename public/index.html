@@ -73,6 +73,23 @@
 
             <div class="map-section">
                 <h2>Map View</h2>
+                <div class="map-controls">
+                    <label class="map-control-label">Display on map:</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="mapDisplay" value="all" checked>
+                            <span>All Waypoints (Original + Pubs)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="mapDisplay" value="pubs">
+                            <span>Only Found Pubs</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="mapDisplay" value="both">
+                            <span>Both with Different Icons</span>
+                        </label>
+                    </div>
+                </div>
                 <div id="map"></div>
             </div>
 

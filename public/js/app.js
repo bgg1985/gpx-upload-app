@@ -26,6 +26,7 @@ const AppState = {
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('GPX Route Pub Finder initialized');
+  MapManager.init();
   FileUploadManager.init();
   SearchManager.init();
 });
