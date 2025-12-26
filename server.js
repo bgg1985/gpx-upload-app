@@ -36,6 +36,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(\`Server running on port \${PORT}\`);
-  console.log(\`Visit http://localhost:\${PORT} to use the app\`);
+  console.log('Server running on port ' + PORT);
+  console.log('Visit http://localhost:' + PORT + ' to use the app');
 });
