@@ -80,7 +80,7 @@ const MapManager = {
           icon: L.divIcon({
             className: 'custom-marker',
             html: isDrinking ? '🍺' : '📍',
-            iconSize: [30, 30]
+            iconSize: [50, 50]
           })
         });
         
@@ -107,7 +107,7 @@ const MapManager = {
           icon: L.divIcon({
             className: 'establishment-marker',
             html: '🍺',
-            iconSize: [30, 30]
+            iconSize: [50, 50]
           })
         });
         
