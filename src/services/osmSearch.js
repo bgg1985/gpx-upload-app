@@ -4,22 +4,18 @@ const { calculateBoundingBox, isPointNearRoute } = require('../utils/geoUtils');
 async function searchDrinkingEstablishments(track, maxDistance) {
   try {
     const bbox = calculateBoundingBox(track, maxDistance);
-    const bboxString = \`\${bbox.minLat},\${bbox.minLon},\${bbox.maxLat},\${bbox.maxLon}\`;
+    const bboxString = bbox.minLat + ',' + bbox.minLon + ',' + bbox.maxLat + ',' + bbox.maxLon;
 
-    const query = \`
-      [out:json][timeout:25];
-      (
-        node["amenity"="pub"](\${bboxString});
-        node["amenity"="bar"](\${bboxString});
-        node["amenity"="biergarten"](\${bboxString});
-        node["amenity"="nightclub"](\${bboxString});
-        way["amenity"="pub"](\${bboxString});
-        way["amenity"="bar"](\${bboxString});
-        way["amenity"="biergarten"](\${bboxString});
-        way["amenity"="nightclub"](\${bboxString});
-      );
-      out center;
-    \`;
+    const query = '[out:json][timeout:25];(' +
+      'node["amenity"="pub"](' + bboxString + ');' +
+      'node["amenity"="bar"](' + bboxString + ');' +
+      'node["amenity"="biergarten"](' + bboxString + ');' +
+      'node["amenity"="nightclub"](' + bboxString + ');' +
+      'way["amenity"="pub"](' + bboxString + ');' +
+      'way["amenity"="bar"](' + bboxString + ');' +
+      'way["amenity"="biergarten"](' + bboxString + ');' +
+      'way["amenity"="nightclub"](' + bboxString + ');' +
+      ');out center;';
 
     const response = await axios.post(
       'https://overpass-api.de/api/interpreter',
